@@ -72,7 +72,8 @@ for n = N_img:-1:1
 end
 
 %% Reconstruct the video using 'ffmpeg'
-system('ffmpeg -r 10 -start_number 0 -i croppic_%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
+% Manually input in terminal 
+% system('ffmpeg -r 10 -start_number 0 -i croppic_%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
 
 
 
