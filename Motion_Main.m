@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-search_step = 8;
+search_step = 4;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
@@ -55,7 +55,7 @@ cnt = 1;
 for n = N_img:-1:1
     img_name = img_name_lst{n}
     img_tmp = double(rgb2gray(imread(img_name)));
-    for ii = 1:1:(N - width_inx*8)
+    for ii = 1:1:(N - width_inx*search_step)
         crop_tmp = img_tmp(:,ii+1:ii+(width_inx - 1)*search_step);
         MSE_tmp(ii) = mean(mean((crop_tmp - crop_im2).^2));
     end
