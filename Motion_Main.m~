@@ -73,15 +73,24 @@ for n = N_img:-1:1
     diff_img = (abs(double(img_compare) - double(crop_im2)));
     %figure
     %imshow(uint8(diff_img));
-    cnt = cnt + 1;    
+    cnt = cnt + 1;
 end
 
+crop_img = dir('crop*');
+crop_img_lst = {crop_img.name};
+
+for ii = 1:1:N_img-1
+    crop_name1 = crop_img_lst{ii};
+    crop_name2 = crop_img_lst{ii + 1};
+    crop_tmp1 = imread(crop_name1);
+    crop_tmp2 = imread(crop_name2);
+    
 Ia = crop_im1;
 Ib = crop_im2;
 [fa, da] = vl_sift(single(Ia));
 [fb, db] = vl_sift(single(Ib));
 % [matches_raw, scores] = vl_ubcmatch(da, db);
-[matches_select, scores] = vl_ubcmatch(da, db)
+[matches_select, scores] = vl_ubcmatch(da, db);
 new_img = [Ia,Ib];
 
 % cnt = 1;
@@ -91,19 +100,19 @@ new_img = [Ia,Ib];
 %         cnt = cnt + 1;
 %     else
 %     end
-% end   
+% end
 
 figure
 imshow(uint8(new_img))
-hold on        
+hold on
 for ii  = 1:1:size(matches_select,2)
     indx1 = matches_select(1,ii);
     indx2 = matches_select(2,ii);
     x1 = fa(1,indx1);
     y1 = fa(2,indx1);
-    x2 = fb(1,indx2) + size(Ia,2);
+    x2 = fb(1,indx2);
     y2 = fb(2,indx2);
-    line([x1,x2],[y1,y2]);
+    line([x1,x2 + size(Ia,2)],[y1,y2]);
 end
 
 %% Reconstruct the video using 'ffmpeg'

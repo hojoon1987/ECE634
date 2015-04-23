@@ -6,6 +6,7 @@ search_step = 8;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
+system('rm sift*')
 
 %% Load first fame and last frame of the video sequence
 img_lst = dir('*.jpg');
@@ -74,42 +75,63 @@ for n = N_img:-1:1
     %figure
     %imshow(uint8(diff_img));
     cnt = cnt + 1;
-    
 end
 
-% Ia = crop_im1;
-% Ib = crop_im2;
-% [fa, da] = vl_sift(single(Ia));
-% [fb, db] = vl_sift(single(Ib));
-% % [matches_raw, scores] = vl_ubcmatch(da, db);
-% [matches_select, scores] = vl_ubcmatch(da, db)
-% new_img = [Ia,Ib];
-% 
-% % cnt = 1;
-% % for ii = 1:1:size(matches_raw,2)
-% %     if scores(ii) > mean(scores)
-% %         matches_select(:,cnt) = matches_raw(:,ii);
-% %         cnt = cnt + 1;
-% %     else
-% %     end
-% % end
-% 
-% figure
-% imshow(uint8(new_img))
-% hold on        
-% for ii  = 1:1:size(matches_select,2)
-%     indx1 = matches_select(1,ii);
-%     indx2 = matches_select(2,ii);
-%     x1 = fa(1,indx1);
-%     y1 = fa(2,indx1);
-%     x2 = fb(1,indx2) + size(Ia,2);
-%     y2 = fb(2,indx2);
-%     line([x1,x2],[y1,y2]);
-% end
+crop_img = dir('crop*');
+crop_img_lst = {crop_img.name};
+
+figure
+for jj = 1:1:N_img-1
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + 1};
+    crop_tmp1 = imread(crop_name1);
+    crop_tmp2 = imread(crop_name2);
+    % Prepare the image for the SIFT operator
+    Ia = rgb2gray(crop_tmp1);
+    Ib = rgb2gray(crop_tmp2);
+    [fa, da] = vl_sift(single(Ia));
+    [fb, db] = vl_sift(single(Ib));
+    % [matches_raw, scores] = vl_ubcmatch(da, db);
+    [matches_select, scores] = vl_ubcmatch(da, db);
+    new_img = [Ia,Ib];
+    
+    % cnt = 1;
+    % for ii = 1:1:size(matches_raw,2)
+    %     if scores(ii) > mean(scores)
+    %         matches_select(:,cnt) = matches_raw(:,ii);
+    %         cnt = cnt + 1;
+    %     else
+    %     end
+    % end
+    
+    % figure
+    imshow(uint8(new_img))
+    hold on
+    for ii  = 1:1:size(matches_select,2)
+        indx1 = matches_select(1,ii);
+        indx2 = matches_select(2,ii);
+        x1 = fa(1,indx1);
+        y1 = fa(2,indx1);
+        x2 = fb(1,indx2);
+        y2 = fb(2,indx2);
+        line([x1,x2 + size(Ia,2)],[y1,y2]);
+    end
+    
+    %figure
+    %imshow(uint8(new_img))
+    %hold on
+    save_name = ['siftpic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['siftpic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(gcf, save_name, 'JPEG')
+end
 
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
-% system('ffmpeg -r 10 -start_number 0 -i croppic_%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
+% system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
 
 
 
