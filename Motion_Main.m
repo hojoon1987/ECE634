@@ -47,7 +47,7 @@ for n = 50:-1:10
     end
     shift_vec(cnt) = find(MSE_tmp == min(MSE_tmp));
     img_save = img_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*8);
-    save_name = ['croppic00', img_name];
+    save_name = ['croppic00',num2str(n), '.jpg'];
     imwrite(uint8(img_save), save_name, 'JPEG')
     cnt = cnt + 1;
     
