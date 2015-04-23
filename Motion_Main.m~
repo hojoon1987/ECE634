@@ -73,8 +73,7 @@ for n = N_img:-1:1
     diff_img = (abs(double(img_compare) - double(crop_im2)));
     %figure
     %imshow(uint8(diff_img));
-    cnt = cnt + 1;
-    
+    cnt = cnt + 1;    
 end
 
 Ia = crop_im1;
@@ -92,7 +91,7 @@ new_img = [Ia,Ib];
 %         cnt = cnt + 1;
 %     else
 %     end
-% end
+% end   
 
 figure
 imshow(uint8(new_img))
@@ -109,7 +108,7 @@ end
 
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
-% system('ffmpeg -r 10 -start_number 0 -i croppic_%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
+% system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
 
 
 
