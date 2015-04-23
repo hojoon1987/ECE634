@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-search_step = 4;
+search_step = 8;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
@@ -53,7 +53,7 @@ imshow(uint8(crop_im2))
 
 cnt = 1;
 for n = N_img:-1:1
-    img_name = img_name_lst{n}
+    img_name = img_name_lst{n};
     img_tmp = double(rgb2gray(imread(img_name)));
     for ii = 1:1:(N - width_inx*search_step)
         crop_tmp = img_tmp(:,ii+1:ii+(width_inx - 1)*search_step);
@@ -62,17 +62,23 @@ for n = N_img:-1:1
     shift_vec(cnt) = find(MSE_tmp == min(MSE_tmp));
     rgb_tmp = double(imread(img_name));
     img_save = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+    img_compare = img_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step);
     save_name = ['croppic00',num2str(n-1), '.jpg'];
     if n < 11
         save_name = ['croppic000', num2str(n-1), '.jpg'];
     else
     end
     imwrite(uint8(img_save), save_name, 'JPEG')
+    diff_img = (abs(double(img_compare) - double(crop_im2)));
+    figure
+    imshow(uint8(diff_img));
     cnt = cnt + 1;
 end
 
+
+
 %% Reconstruct the video using 'ffmpeg'
-% Manually input in terminal 
+% Manually input in terminal
 % system('ffmpeg -r 10 -start_number 0 -i croppic_%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
 
 
