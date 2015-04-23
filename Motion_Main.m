@@ -126,7 +126,7 @@ for jj = 1:1:N_img-1
         save_name = ['siftpic000', num2str(jj-1), '.jpg'];
     else
     end
-    imwrite(gcf, save_name, 'JPEG')
+    saveas(gcf, save_name, 'jpg');
 end
 
 %% Reconstruct the video using 'ffmpeg'
