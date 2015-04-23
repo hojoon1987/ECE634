@@ -35,7 +35,7 @@ title('The MSE of first and last frame assuming horizontal translation only', 'F
 xlabel('The shift pixel', 'FontSize', 15)
 ylabel('The MSE value', 'FontSize', 15)
 
-width_inx = find(MSE == min(MSE))
+width_inx = find(MSE == min(MSE));
 
 crop_im1 = Im1_gray(:,N-(width_inx-1)*search_step+1:N);
 crop_im2 = Im2_gray(:,1:search_step*(width_inx-1));
