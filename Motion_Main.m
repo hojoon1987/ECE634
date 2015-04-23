@@ -26,7 +26,7 @@ Im2_gray = double(rgb2gray(Im2));
 cnt = 1;
 for width = search_step:search_step:N
     MSE(cnt) = mean(mean((Im1_gray(:,N-width+1:N) - Im2_gray(:,1:width)).^2));
-    cnt = cnt + 1
+    cnt = cnt + 1;
 end
 
 figure
