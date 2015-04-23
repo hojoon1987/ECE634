@@ -77,35 +77,35 @@ for n = N_img:-1:1
     
 end
 
-% Ia = crop_im1;
-% Ib = crop_im2;
-% [fa, da] = vl_sift(single(Ia));
-% [fb, db] = vl_sift(single(Ib));
-% % [matches_raw, scores] = vl_ubcmatch(da, db);
-% [matches_select, scores] = vl_ubcmatch(da, db)
-% new_img = [Ia,Ib];
-% 
-% % cnt = 1;
-% % for ii = 1:1:size(matches_raw,2)
-% %     if scores(ii) > mean(scores)
-% %         matches_select(:,cnt) = matches_raw(:,ii);
-% %         cnt = cnt + 1;
-% %     else
-% %     end
-% % end
-% 
-% figure
-% imshow(uint8(new_img))
-% hold on        
-% for ii  = 1:1:size(matches_select,2)
-%     indx1 = matches_select(1,ii);
-%     indx2 = matches_select(2,ii);
-%     x1 = fa(1,indx1);
-%     y1 = fa(2,indx1);
-%     x2 = fb(1,indx2) + size(Ia,2);
-%     y2 = fb(2,indx2);
-%     line([x1,x2],[y1,y2]);
+Ia = crop_im1;
+Ib = crop_im2;
+[fa, da] = vl_sift(single(Ia));
+[fb, db] = vl_sift(single(Ib));
+% [matches_raw, scores] = vl_ubcmatch(da, db);
+[matches_select, scores] = vl_ubcmatch(da, db)
+new_img = [Ia,Ib];
+
+% cnt = 1;
+% for ii = 1:1:size(matches_raw,2)
+%     if scores(ii) > mean(scores)
+%         matches_select(:,cnt) = matches_raw(:,ii);
+%         cnt = cnt + 1;
+%     else
+%     end
 % end
+
+figure
+imshow(uint8(new_img))
+hold on        
+for ii  = 1:1:size(matches_select,2)
+    indx1 = matches_select(1,ii);
+    indx2 = matches_select(2,ii);
+    x1 = fa(1,indx1);
+    y1 = fa(2,indx1);
+    x2 = fb(1,indx2) + size(Ia,2);
+    y2 = fb(2,indx2);
+    line([x1,x2],[y1,y2]);
+end
 
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
