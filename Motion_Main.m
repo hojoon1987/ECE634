@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-search_step = 8;
+search_step = 4;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
@@ -80,7 +80,7 @@ end
 crop_img = dir('crop*');
 crop_img_lst = {crop_img.name};
 
-figure
+%figure
 for jj = 1:1:N_img-1
     % Select the area to crop
     crop_name1 = crop_img_lst{jj};
@@ -105,9 +105,14 @@ for jj = 1:1:N_img-1
     %     end
     % end
     
-    % figure
-    imshow(uint8(new_img))
-    hold on
+    %figure
+    
+    %% Save the SIFT results
+    %figure
+    %imshow(uint8(new_img))
+    %hold on
+    clear dx_tmp
+    clear dy_tmp
     for ii  = 1:1:size(matches_select,2)
         indx1 = matches_select(1,ii);
         indx2 = matches_select(2,ii);
@@ -115,20 +120,23 @@ for jj = 1:1:N_img-1
         y1 = fa(2,indx1);
         x2 = fb(1,indx2);
         y2 = fb(2,indx2);
-        line([x1,x2 + size(Ia,2)],[y1,y2]);
+        dx_tmp(ii) = x2 - x1;
+        dy_tmp(ii) = y2 - y1;
+        
+        %    line([x1,x2 + size(Ia,2)],[y1,y2]);
     end
-    
-    %figure
-    %imshow(uint8(new_img))
-    %hold on
-    save_name = ['siftpic00',num2str(jj-1), '.jpg'];
-    if jj < 11
-        save_name = ['siftpic000', num2str(jj-1), '.jpg'];
-    else
-    end
-    saveas(gcf, save_name, 'jpg');
+    dx(jj) = median(dx_tmp);
+    dy(jj) = median(dy_tmp);
+    %     save_name = ['siftpic00',num2str(jj-1), '.jpg'];
+    %     if jj < 11
+    %         save_name = ['siftpic000', num2str(jj-1), '.jpg'];
+    %     else
+    %     end
+    %     saveas(gcf, save_name, 'jpg');
+    %     close(gcf)
 end
-
+dx
+dy
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
 % system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
