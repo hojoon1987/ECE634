@@ -125,8 +125,12 @@ for jj = 1:1:N_img-1
         
         %    line([x1,x2 + size(Ia,2)],[y1,y2]);
     end
+        figure
+         scatter(dx_tmp,dy_tmp)
     dx(jj) = median(dx_tmp);
     dy(jj) = median(dy_tmp);
+    hold on
+    scatter(dx(jj),dy(jj), 'r')
     %     save_name = ['siftpic00',num2str(jj-1), '.jpg'];
     %     if jj < 11
     %         save_name = ['siftpic000', num2str(jj-1), '.jpg'];
