@@ -551,3 +551,6 @@ for ii = 1:1:min_size
     cnt = cnt - 1;
 end
 close all
+% system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
+% system('ffmpeg -r 10 -start_number 0 -i with_fil_pic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p withfilter.mp4')
+% system('ffmpeg -r 10 -start_number 0 -i no_fil_pic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p nofilter.mp4')
