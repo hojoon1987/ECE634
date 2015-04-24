@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-search_step = 4;
+search_step = 2;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
@@ -125,8 +125,8 @@ for jj = 1:1:N_img-1
         
         %    line([x1,x2 + size(Ia,2)],[y1,y2]);
     end
-        figure
-         scatter(dx_tmp,dy_tmp)
+    figure
+    scatter(dx_tmp,dy_tmp)
     dx(jj) = median(dx_tmp);
     dy(jj) = median(dy_tmp);
     hold on
@@ -139,6 +139,7 @@ for jj = 1:1:N_img-1
     %     saveas(gcf, save_name, 'jpg');
     %     close(gcf)
 end
+close all
 dx
 dy
 %% Reconstruct the video using 'ffmpeg'
