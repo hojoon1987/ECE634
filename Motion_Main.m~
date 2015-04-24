@@ -325,9 +325,13 @@ for ii = 1:1:min_size
 end
 
 
-
+close all
 
 %% Apply Smoothing Filter to Difference Detection
+filtersize = 5;
+sigma = 2;
+GaussFil = fspecial('gaussian',[filtersize filtersize], sigma);
+
 %% Calculate the difference across each cropped frame: Temporal Step = 1
 step_temporal = 1;
 cnt = 1;
@@ -335,8 +339,10 @@ for jj = 1:1:N_img - step_temporal
     % Select the area to crop
     crop_name1 = crop_img_lst{jj};
     crop_name2 = crop_img_lst{jj + step_temporal};
-    crop_tmp1 = rgb2gray(imread(crop_name1));
-    crop_tmp2 = rgb2gray(imread(crop_name2));
+    crop_tmp1_unfil = rgb2gray(imread(crop_name1));
+    crop_tmp2_unfil = rgb2gray(imread(crop_name2));
+    crop_tmp1 = imfilter(crop_tmp1_unfil, GaussFil, 'replicate');
+    crop_tmp2 = imfilter(crop_tmp2_unfil, GaussFil, 'replicate');
     diff_img_1(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
     %figure
     %imshow(uint8(diff_img_1(:,:,cnt)));
@@ -357,8 +363,10 @@ for jj = 1:1:N_img - step_temporal
     % Select the area to crop
     crop_name1 = crop_img_lst{jj};
     crop_name2 = crop_img_lst{jj + step_temporal};
-    crop_tmp1 = rgb2gray(imread(crop_name1));
-    crop_tmp2 = rgb2gray(imread(crop_name2));
+    crop_tmp1_unfil = rgb2gray(imread(crop_name1));
+    crop_tmp2_unfil = rgb2gray(imread(crop_name2));
+    crop_tmp1 = imfilter(crop_tmp1_unfil, GaussFil, 'replicate');
+    crop_tmp2 = imfilter(crop_tmp2_unfil, GaussFil, 'replicate');
     diff_img_3(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
     %figure
     %imshow(uint8(diff_img_3(:,:,cnt)));
@@ -379,8 +387,10 @@ for jj = 1:1:N_img - step_temporal
     % Select the area to crop
     crop_name1 = crop_img_lst{jj};
     crop_name2 = crop_img_lst{jj + step_temporal};
-    crop_tmp1 = rgb2gray(imread(crop_name1));
-    crop_tmp2 = rgb2gray(imread(crop_name2));
+    crop_tmp1_unfil = rgb2gray(imread(crop_name1));
+    crop_tmp2_unfil = rgb2gray(imread(crop_name2));
+    crop_tmp1 = imfilter(crop_tmp1_unfil, GaussFil, 'replicate');
+    crop_tmp2 = imfilter(crop_tmp2_unfil, GaussFil, 'replicate');
     diff_img_5(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
     %figure
     %imshow(uint8(diff_img_5(:,:,cnt)));
@@ -499,8 +509,15 @@ for ii = 1:1:min_size
         end
     end
     rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
-    figure
-    imshow(uint8(rgb_tmp))
+    %figure
+    %imshow(uint8(rgb_tmp))
+    
+    save_name = ['with_fil_pic00',num2str(ii-1), '.jpg'];
+    if ii < 11
+        save_name = ['with_fil_pic000', num2str(ii-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(), save_name, 'JPEG')
     cnt = cnt - 1;
 end
-
+close all

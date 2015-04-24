@@ -8,6 +8,8 @@ system('rm *crop*');
 system('rm *mp4');
 system('rm sift*');
 system('rm step*');
+system('rm with*');
+system('rm no*');
 
 %% Load first fame and last frame of the video sequence
 img_lst = dir('*.jpg');
@@ -311,16 +313,44 @@ for ii = 1:1:min_size
     for m = 1:1:size(img_replacement,1)
         for n = 1:1:size(img_replacement,2)
             if diff_flag_matrix(m,n,ii) == 1
-               img_replacement(m,n,1) = r_replacement(m,n);
-               img_replacement(m,n,2) = g_replacement(m,n);
-               img_replacement(m,n,3) = b_replacement(m,n);               
+                img_replacement(m,n,1) = r_replacement(m,n);
+                img_replacement(m,n,2) = g_replacement(m,n);
+                img_replacement(m,n,3) = b_replacement(m,n);
             else
             end
         end
     end
     rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
-    figure
-    imshow(uint8(rgb_tmp))
+    %figure
+    %imshow(uint8(rgb_tmp))
+    cnt = N_img;
+    for ii = 1:1:min_size
+        img_name = img_name_lst{ii};
+        rgb_tmp = double(imread(img_name));
+        img_replacement = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+        for m = 1:1:size(img_replacement,1)
+            for n = 1:1:size(img_replacement,2)
+                if diff_flag_matrix(m,n,ii) == 1
+                    img_replacement(m,n,1) = r_replacement(m,n);
+                    img_replacement(m,n,2) = g_replacement(m,n);
+                    img_replacement(m,n,3) = b_replacement(m,n);
+                else
+                end
+            end
+        end
+        rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
+        %figure
+        %imshow(uint8(rgb_tmp))
+        
+        save_name = ['no_fil_pic00',num2str(ii-1), '.jpg'];
+        if ii < 11
+            save_name = ['no_fil_pic000', num2str(ii-1), '.jpg'];
+        else
+        end
+        imwrite(uint8(rgb_tmp), save_name, 'JPEG')
+        cnt = cnt - 1;
+    end
+    close all
     cnt = cnt - 1;
 end
 
@@ -328,8 +358,8 @@ end
 close all
 
 %% Apply Smoothing Filter to Difference Detection
-filtersize = 3;
-sigma = 0.5;
+filtersize = 5;
+sigma = 2;
 GaussFil = fspecial('gaussian',[filtersize filtersize], sigma);
 
 %% Calculate the difference across each cropped frame: Temporal Step = 1
@@ -501,16 +531,23 @@ for ii = 1:1:min_size
     for m = 1:1:size(img_replacement,1)
         for n = 1:1:size(img_replacement,2)
             if diff_flag_matrix(m,n,ii) == 1
-               img_replacement(m,n,1) = r_replacement(m,n);
-               img_replacement(m,n,2) = g_replacement(m,n);
-               img_replacement(m,n,3) = b_replacement(m,n);               
+                img_replacement(m,n,1) = r_replacement(m,n);
+                img_replacement(m,n,2) = g_replacement(m,n);
+                img_replacement(m,n,3) = b_replacement(m,n);
             else
             end
         end
     end
     rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
-    figure
-    imshow(uint8(rgb_tmp))
+    %figure
+    %imshow(uint8(rgb_tmp))
+    
+    save_name = ['with_fil_pic00',num2str(ii-1), '.jpg'];
+    if ii < 11
+        save_name = ['with_fil_pic000', num2str(ii-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(rgb_tmp), save_name, 'JPEG')
     cnt = cnt - 1;
 end
-
+close all
