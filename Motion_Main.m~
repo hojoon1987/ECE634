@@ -62,6 +62,7 @@ for n = N_img:-1:1
         crop_tmp = img_tmp(:,ii+1:ii+(width_inx - 1)*search_step);
         MSE_tmp(ii) = mean(mean((crop_tmp - crop_im2).^2));
     end
+    %% Very important, save for future
     shift_vec(cnt) = find(MSE_tmp == min(MSE_tmp));
     rgb_tmp = double(imread(img_name));
     img_save = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
@@ -169,7 +170,7 @@ for jj = 1:1:N_img - step_temporal
 end
 %close all
 
-%% Calculate the difference across each cropped frame: Temporal Step = 1
+%% Calculate the difference across each cropped frame: Temporal Step = 3
 step_temporal = 3;
 cnt = 1;
 for jj = 1:1:N_img - step_temporal
@@ -191,7 +192,7 @@ for jj = 1:1:N_img - step_temporal
 end
 %close all
 
-%% Calculate the difference across each cropped frame: Temporal Step = 1
+%% Calculate the difference across each cropped frame: Temporal Step = 5
 step_temporal = 5;
 cnt = 1;
 for jj = 1:1:N_img - step_temporal
@@ -232,10 +233,274 @@ for ii = 1:1:min_size
             else
             end
         end
-    end     
+    end
     flag_tmp = diff_flag_matrix(:,:,ii);
-    figure
-    imagesc(flag_tmp)
+    %     figure
+    %     imagesc(flag_tmp)
 end
 
+cnt = N_img;
+for jj = 1:1:min_size
+    % Select the area to crop
+    img_name = img_name_lst{jj};
+    rgb_tmp = double(imread(img_name));
+    img_rgb = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+    %     figure
+    %     imshow(uint8(img_rgb))
+    img_r = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,1);
+    img_g = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,2);
+    img_b = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,3);
+    
+    img_r_matrix(:,:,jj) = img_r;
+    img_g_matrix(:,:,jj) = img_g;
+    img_b_matrix(:,:,jj) = img_b;
+    
+    cnt = cnt - 1;
+end
+
+% for ii = 1:1:min_size
+%     img_name = img_name_lst{ii};
+%     rgb_tmp = double(imread(img_name));
+%     img_replacement = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+%     cnt = 0;
+%     tem_r = 0;
+%     tem_g = 0;
+%     tem_b = 0;
+%     for m = 1:1:size(img_replacement,1)
+%         for n = 1:1:size(img_replacement,2)
+%             if diff_flag_matrix(m,n,ii) == 1
+%                 for jj = 1:1:min_size
+%                     if diff_flag_matrix(m,n,jj) == 0
+%                         tem_r = tem_r + img_r_matrix(m,n,jj);
+%                         tem_g = tem_g + img_g_matrix(m,n,jj);
+%                         tem_b = tem_b + img_b_matrix(m,n,jj);
+%                         cnt = cnt + 1;
+%                     else
+%                     end
+%                 end
+%             else
+%             end
+%         end
+%     end
+% end
+
+r_replacement = zeros(size(img_r));
+g_replacement = zeros(size(img_g));
+b_replacement = zeros(size(img_b));
+
+for m = 1:1:size(r_replacement,1)
+    for n = 1:1:size(r_replacement,2)
+        r_replacement(m,n) = sum(img_r_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+        g_replacement(m,n) = sum(img_g_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+        b_replacement(m,n) = sum(img_b_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+    end
+end
+figure
+imshow(uint8(r_replacement))
+figure
+imshow(uint8(g_replacement))
+figure
+imshow(uint8(b_replacement))
+
+
+cnt = N_img;
+for ii = 1:1:min_size
+    img_name = img_name_lst{ii};
+    rgb_tmp = double(imread(img_name));
+    img_replacement = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+    for m = 1:1:size(img_replacement,1)
+        for n = 1:1:size(img_replacement,2)
+            if diff_flag_matrix(m,n,ii) == 1
+               img_replacement(m,n,1) = r_replacement(m,n);
+               img_replacement(m,n,2) = g_replacement(m,n);
+               img_replacement(m,n,3) = b_replacement(m,n);               
+            else
+            end
+        end
+    end
+    rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
+    figure
+    imshow(uint8(rgb_tmp))
+    cnt = cnt - 1;
+end
+
+
+
+
+%% Apply Smoothing Filter to Difference Detection
+%% Calculate the difference across each cropped frame: Temporal Step = 1
+step_temporal = 1;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_1(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_1(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step1pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step1pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Calculate the difference across each cropped frame: Temporal Step = 3
+step_temporal = 3;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_3(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_3(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step3pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step3pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Calculate the difference across each cropped frame: Temporal Step = 5
+step_temporal = 5;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_5(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_5(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step5pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step5pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Find the minimum length of diff_img_n matrices
+min_size = size(diff_img_5, 3);
+diff_combined = diff_img_1(:,:,1:min_size) + diff_img_3(:,:,1:min_size) ...
+    + diff_img_5(:,:,1:min_size);
+
+%% Setting up a threshold for video movement flag
+Threshold = 30;
+diff_flag_matrix = zeros(size(diff_combined));
+for ii = 1:1:min_size
+    img_diff_tmp = diff_combined(:,:,ii);
+    %     figure
+    %     imshow(uint8(img_diff_tmp));
+    for m = 1:1:size(img_diff_tmp, 1)
+        for n = 1:1:size(img_diff_tmp, 2)
+            if (img_diff_tmp(m,n) > Threshold)
+                diff_flag_matrix(m,n,ii) = 1;
+            else
+            end
+        end
+    end
+    flag_tmp = diff_flag_matrix(:,:,ii);
+    %     figure
+    %     imagesc(flag_tmp)
+end
+
+cnt = N_img;
+for jj = 1:1:min_size
+    % Select the area to crop
+    img_name = img_name_lst{jj};
+    rgb_tmp = double(imread(img_name));
+    img_rgb = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+    %     figure
+    %     imshow(uint8(img_rgb))
+    img_r = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,1);
+    img_g = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,2);
+    img_b = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,3);
+    
+    img_r_matrix(:,:,jj) = img_r;
+    img_g_matrix(:,:,jj) = img_g;
+    img_b_matrix(:,:,jj) = img_b;
+    
+    cnt = cnt - 1;
+end
+
+% for ii = 1:1:min_size
+%     img_name = img_name_lst{ii};
+%     rgb_tmp = double(imread(img_name));
+%     img_replacement = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+%     cnt = 0;
+%     tem_r = 0;
+%     tem_g = 0;
+%     tem_b = 0;
+%     for m = 1:1:size(img_replacement,1)
+%         for n = 1:1:size(img_replacement,2)
+%             if diff_flag_matrix(m,n,ii) == 1
+%                 for jj = 1:1:min_size
+%                     if diff_flag_matrix(m,n,jj) == 0
+%                         tem_r = tem_r + img_r_matrix(m,n,jj);
+%                         tem_g = tem_g + img_g_matrix(m,n,jj);
+%                         tem_b = tem_b + img_b_matrix(m,n,jj);
+%                         cnt = cnt + 1;
+%                     else
+%                     end
+%                 end
+%             else
+%             end
+%         end
+%     end
+% end
+
+r_replacement = zeros(size(img_r));
+g_replacement = zeros(size(img_g));
+b_replacement = zeros(size(img_b));
+
+for m = 1:1:size(r_replacement,1)
+    for n = 1:1:size(r_replacement,2)
+        r_replacement(m,n) = sum(img_r_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+        g_replacement(m,n) = sum(img_g_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+        b_replacement(m,n) = sum(img_b_matrix(m,n,:).*(1-diff_flag_matrix(m,n,:)))/sum(1-diff_flag_matrix(m,n,:));
+    end
+end
+figure
+imshow(uint8(r_replacement))
+figure
+imshow(uint8(g_replacement))
+figure
+imshow(uint8(b_replacement))
+
+
+cnt = N_img;
+for ii = 1:1:min_size
+    img_name = img_name_lst{ii};
+    rgb_tmp = double(imread(img_name));
+    img_replacement = rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:);
+    for m = 1:1:size(img_replacement,1)
+        for n = 1:1:size(img_replacement,2)
+            if diff_flag_matrix(m,n,ii) == 1
+               img_replacement(m,n,1) = r_replacement(m,n);
+               img_replacement(m,n,2) = g_replacement(m,n);
+               img_replacement(m,n,3) = b_replacement(m,n);               
+            else
+            end
+        end
+    end
+    rgb_tmp(:, shift_vec(cnt) + 1: shift_vec(cnt) + (width_inx - 1)*search_step,:) = img_replacement;
+    figure
+    imshow(uint8(rgb_tmp))
+    cnt = cnt - 1;
+end
 
