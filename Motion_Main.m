@@ -125,12 +125,12 @@ for jj = 1:1:N_img-1
         
         %    line([x1,x2 + size(Ia,2)],[y1,y2]);
     end
-    figure
-    scatter(dx_tmp,dy_tmp)
+    %figure
+    %scatter(dx_tmp,dy_tmp)
     dx(jj) = median(dx_tmp);
     dy(jj) = median(dy_tmp);
-    hold on
-    scatter(dx(jj),dy(jj), 'r')
+    %hold on
+    %scatter(dx(jj),dy(jj), 'r')
     %     save_name = ['siftpic00',num2str(jj-1), '.jpg'];
     %     if jj < 11
     %         save_name = ['siftpic000', num2str(jj-1), '.jpg'];
@@ -139,9 +139,9 @@ for jj = 1:1:N_img-1
     %     saveas(gcf, save_name, 'jpg');
     %     close(gcf)
 end
-close all
-dx
-dy
+%close all
+%dx
+%dy
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
 % system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
