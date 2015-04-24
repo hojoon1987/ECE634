@@ -6,7 +6,8 @@ search_step = 2;
 %% Clean all the intermediate results
 system('rm *crop*');
 system('rm *mp4');
-system('rm sift*')
+system('rm sift*');
+system('rm step*');
 
 %% Load first fame and last frame of the video sequence
 img_lst = dir('*.jpg');
@@ -71,9 +72,9 @@ for n = N_img:-1:1
     else
     end
     imwrite(uint8(img_save), save_name, 'JPEG')
-    diff_img = (abs(double(img_compare) - double(crop_im2)));
-    %figure
-    %imshow(uint8(diff_img));
+    %     diff_img = (abs(double(img_compare) - double(crop_im2)));
+    %     figure
+    %     imshow(uint8(diff_img));
     cnt = cnt + 1;
 end
 
@@ -145,6 +146,78 @@ end
 %% Reconstruct the video using 'ffmpeg'
 % Manually input in terminal
 % system('ffmpeg -r 10 -start_number 0 -i croppic%4d.jpg -vcodec libx264 -r 30 -pix_fmt yuv420p stable_frame.mp4')
+
+%% Calculate the difference across each cropped frame: Temporal Step = 1
+step_temporal = 1;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_1(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_1(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step1pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step1pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Calculate the difference across each cropped frame: Temporal Step = 1
+step_temporal = 3;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_3(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_3(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step3pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step3pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Calculate the difference across each cropped frame: Temporal Step = 1
+step_temporal = 5;
+cnt = 1;
+for jj = 1:1:N_img - step_temporal
+    % Select the area to crop
+    crop_name1 = crop_img_lst{jj};
+    crop_name2 = crop_img_lst{jj + step_temporal};
+    crop_tmp1 = rgb2gray(imread(crop_name1));
+    crop_tmp2 = rgb2gray(imread(crop_name2));
+    diff_img_5(:,:,cnt) = abs(crop_tmp2 - crop_tmp1);
+    %figure
+    %imshow(uint8(diff_img_5(:,:,cnt)));
+    cnt = cnt + 1;
+    save_name = ['step5pic00',num2str(jj-1), '.jpg'];
+    if jj < 11
+        save_name = ['step5pic000', num2str(jj-1), '.jpg'];
+    else
+    end
+    imwrite(uint8(abs(crop_tmp2 - crop_tmp1)), save_name, 'JPEG')
+end
+%close all
+
+%% Find the minimum length of diff_img_n matrices
+min_size = size(diff_img_5, 3);
+diff_combined = diff_img_1(:,:,1:min_size) + diff_img_3(:,:,1:min_size) ...
+    + diff_img_5(:,:,1:min_size);
+
 
 
 
